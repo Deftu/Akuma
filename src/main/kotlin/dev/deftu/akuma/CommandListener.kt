@@ -98,7 +98,7 @@ public class CommandListener : ListenerAdapter() {
                     return
                 }
 
-                val option = subcommand.options.find { it.name == event.focusedOption.name }
+                val option = subcommand.options.find { it.name == event.focusedOption.name } as? CommandOption.AutoCompletingCommandOption
                 if (option == null) {
                     return
                 }
@@ -114,7 +114,7 @@ public class CommandListener : ListenerAdapter() {
                     return
                 }
 
-                val option = subcommand.options.find { it.name == event.focusedOption.name }
+                val option = subcommand.options.find { it.name == event.focusedOption.name } as? CommandOption.AutoCompletingCommandOption
                 if (option == null) {
                     return
                 }
@@ -125,7 +125,7 @@ public class CommandListener : ListenerAdapter() {
             }
 
             else -> {
-                val option = command.options.find { it.name == event.focusedOption.name }
+                val option = command.options.find { it.name == event.focusedOption.name } as? CommandOption.AutoCompletingCommandOption
                 if (option == null) {
                     return
                 }

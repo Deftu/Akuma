@@ -87,10 +87,6 @@ public sealed interface OptionBuilder {
                 name = name,
                 description = description,
                 isRequired = isRequired,
-                choices = emptyList(),
-                isAutoComplete = false,
-                autoComplete = null,
-                channelTypes = EnumSet.noneOf(ChannelType::class.java)
             )
         }
 
@@ -104,8 +100,8 @@ public sealed interface OptionBuilder {
         override var isRequired: Boolean = false,
     ) : OptionBuilder, AutoCompletingOptionBuilder() {
 
-        override fun build(): CommandOption {
-            return CommandOption(
+        override fun build(): CommandOption.AutoCompletingCommandOption {
+            return CommandOption.AutoCompletingCommandOption(
                 type = type,
                 name = name,
                 description = description,
@@ -113,7 +109,29 @@ public sealed interface OptionBuilder {
                 choices = choices,
                 isAutoComplete = isAutoComplete,
                 autoComplete = autoComplete,
-                channelTypes = EnumSet.noneOf(ChannelType::class.java)
+            )
+        }
+
+    }
+
+    public sealed class NumberOptionBuilder(
+        type: OptionType,
+        override val name: String,
+        override val description: String?,
+        override var isRequired: Boolean = false,
+        public var minValue: Double? = null,
+        public var maxValue: Double? = null,
+    ) : BasicAutoCompletingOptionBuilder(type, name, description, false) {
+
+        override fun build(): CommandOption.NumberCommandOption {
+            return CommandOption.NumberCommandOption(
+                type = type,
+                name = name,
+                description = description,
+                isRequired = isRequired,
+                isAutoComplete = isAutoComplete,
+                minValue = minValue,
+                maxValue = maxValue,
             )
         }
 
@@ -129,7 +147,7 @@ public sealed interface OptionBuilder {
         name: String,
         description: String?,
         isAutoComplete: Boolean = false
-    ) : BasicAutoCompletingOptionBuilder(OptionType.INTEGER, name, description, isAutoComplete)
+    ) : NumberOptionBuilder(OptionType.INTEGER, name, description, isAutoComplete)
 
     public class BooleanOption(
         name: String,
@@ -142,9 +160,10 @@ public sealed interface OptionBuilder {
     ) : BasicOptionBuilder(OptionType.USER, name, description)
 
     public class ChannelOption(
-        name: String,
-        description: String?
-    ) : BasicOptionBuilder(OptionType.CHANNEL, name, description) {
+        override val name: String,
+        override val description: String?,
+        override var isRequired: Boolean = false,
+    ) : OptionBuilder {
 
         private val channelTypes = EnumSet.noneOf(ChannelType::class.java)
 
@@ -160,8 +179,13 @@ public sealed interface OptionBuilder {
             channelTypes.addAll(types)
         }
 
-        override fun build(): CommandOption {
-            return super.build().copy(channelTypes = channelTypes)
+        override fun build(): CommandOption.ChannelCommandOption {
+            return CommandOption.ChannelCommandOption(
+                name = name,
+                description = description,
+                isRequired = isRequired,
+                channelTypes = channelTypes,
+            )
         }
 
     }
@@ -180,7 +204,7 @@ public sealed interface OptionBuilder {
         name: String,
         description: String?,
         isAutoComplete: Boolean = false
-    ) : BasicAutoCompletingOptionBuilder(OptionType.NUMBER, name, description, isAutoComplete)
+    ) : NumberOptionBuilder(OptionType.NUMBER, name, description, isAutoComplete)
 
     public class AttachmentOption(
         name: String,

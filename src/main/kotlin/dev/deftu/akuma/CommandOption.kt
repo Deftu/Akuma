@@ -7,43 +7,68 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import java.util.EnumSet
 
-public data class CommandOption(
-    val type: OptionType,
-    val name: String,
-    val description: String?,
-    val isRequired: Boolean,
-    val choices: List<Command.Choice> = emptyList(),
-    val isAutoComplete: Boolean = false,
-    val autoComplete: (suspend (CommandAutoCompleteInteractionEvent) -> Unit)? = null,
-    val channelTypes: EnumSet<ChannelType> = EnumSet.noneOf(ChannelType::class.java),
+public open class CommandOption(
+    public val type: OptionType,
+    public val name: String,
+    public val description: String?,
+    public val isRequired: Boolean,
 ) {
+    public fun asData(): OptionData {
+        return OptionData(type, name, description ?: "No description provided", isRequired).apply(::applyData)
+    }
 
-    public companion object {
+    protected open fun applyData(data: OptionData) {
+    }
 
-        public val autoCompletingTypes: Set<OptionType> = setOf(
-            OptionType.NUMBER,
-            OptionType.STRING,
-            OptionType.INTEGER
-        )
+    public open class AutoCompletingCommandOption(
+        type: OptionType,
+        name: String,
+        description: String?,
+        isRequired: Boolean,
+        public val choices: List<Command.Choice> = emptyList(),
+        public val isAutoComplete: Boolean = false,
+        public val autoComplete: (suspend (CommandAutoCompleteInteractionEvent) -> Unit)? = null,
+    ) : CommandOption(type, name, description, isRequired) {
+
+        override fun applyData(data: OptionData) {
+            super.applyData(data)
+            data.isAutoComplete = true
+        }
 
     }
 
-    public fun asData(): OptionData {
-        return OptionData(type, name, description ?: "No description provided", isRequired).apply {
-            when (this@CommandOption.type) {
-                in autoCompletingTypes -> {
-                    if (this@CommandOption.isAutoComplete) {
-                        this.isAutoComplete = true
-                    }
-                }
+    public class NumberCommandOption(
+        type: OptionType,
+        name: String,
+        description: String?,
+        isRequired: Boolean,
+        choices: List<Command.Choice> = emptyList(),
+        isAutoComplete: Boolean,
+        autoComplete: (suspend (CommandAutoCompleteInteractionEvent) -> Unit)? = null,
+        public val minValue: Double? = null,
+        public val maxValue: Double? = null
+    ) : AutoCompletingCommandOption(type, name, description, isRequired, choices, isAutoComplete, autoComplete) {
 
-                OptionType.CHANNEL -> {
-                    this.setChannelTypes(this@CommandOption.channelTypes)
-                }
-
-                else -> {} // no-op
-            }
+        override fun applyData(data: OptionData) {
+            super.applyData(data)
+            minValue?.let(data::setMinValue)
+            maxValue?.let(data::setMaxValue)
         }
+
+    }
+
+    public class ChannelCommandOption(
+        name: String,
+        description: String?,
+        isRequired: Boolean,
+        public val channelTypes: EnumSet<ChannelType> = EnumSet.noneOf(ChannelType::class.java),
+    ) : CommandOption(OptionType.CHANNEL, name, description, isRequired) {
+
+        override fun applyData(data: OptionData) {
+            super.applyData(data)
+            data.setChannelTypes(channelTypes)
+        }
+
     }
 
 }
