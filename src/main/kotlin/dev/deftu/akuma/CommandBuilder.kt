@@ -1,6 +1,7 @@
 package dev.deftu.akuma
 
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 
 public class CommandBuilder(private val name: String) {
 
@@ -12,6 +13,33 @@ public class CommandBuilder(private val name: String) {
     private var action: (suspend CommandContext.() -> Unit)? = null
 
     public var description: String? = null
+
+    public var isNsfw: Boolean = false
+        set(value) {
+            if (parent != null) {
+                throw IllegalStateException("Cannot set isNsfw on a child command")
+            }
+
+            field = value
+        }
+
+    public var isGuildOnly: Boolean = false
+        set(value) {
+            if (parent != null) {
+                throw IllegalStateException("Cannot set isGuildOnly on a child command")
+            }
+
+            field = value
+        }
+
+    public var defaultGuildPermissions: DefaultMemberPermissions = DefaultMemberPermissions.ENABLED
+        set(value) {
+            if (parent != null) {
+                throw IllegalStateException("Cannot set defaultGuildPermissions on a child command")
+            }
+
+            field = value
+        }
 
     public fun subcommand(name: String, block: CommandBuilder.() -> Unit) {
         if (parent != null) {
@@ -97,6 +125,9 @@ public class CommandBuilder(private val name: String) {
             options = options,
             children = children.map(CommandBuilder::build),
             groups = groups,
+            isNsfw = isNsfw,
+            isGuildOnly = isGuildOnly,
+            defaultGuildPermissions = defaultGuildPermissions,
             action = action
         )
     }
