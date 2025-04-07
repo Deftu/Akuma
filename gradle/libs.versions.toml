@@ -1,0 +1,5 @@
+[versions]
+jda = "5.2.1"
+
+[libraries]
+jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
