@@ -27,6 +27,12 @@ public class MultiCommandBuilder {
         CommandListener.getOrRegister(jda).commands.addAll(commands)
     }
 
+    public fun registerTo(jda: JDA, guildId: Long) {
+        val guild = jda.getGuildById(guildId) ?: return
+        guild.updateCommands().addCommands(commands.map(CommandDefinition::asData)).queue()
+        CommandListener.getOrRegister(jda).commands.addAll(commands)
+    }
+
     public fun build(): List<CommandDefinition> {
         return commands.toList()
     }
@@ -41,11 +47,25 @@ public fun JDA.commands(block: MultiCommandBuilder.() -> Unit) {
     return MultiCommandBuilder().apply(block).registerTo(this)
 }
 
+public fun JDA.commands(guildId: Long, block: MultiCommandBuilder.() -> Unit) {
+    return MultiCommandBuilder().apply(block).registerTo(this, guildId)
+}
+
 public fun JDA.register(builder: MultiCommandBuilder) {
     builder.registerTo(this)
 }
 
+public fun JDA.register(guildId: Long, builder: MultiCommandBuilder) {
+    builder.registerTo(this, guildId)
+}
+
 public fun JDA.register(commands: List<CommandDefinition>) {
-    CommandListener.getOrRegister(this).commands.addAll(commands)
     this.updateCommands().addCommands(commands.map(CommandDefinition::asData)).queue()
+    CommandListener.getOrRegister(this).commands.addAll(commands)
+}
+
+public fun JDA.register(guildId: Long, commands: List<CommandDefinition>) {
+    val guild = getGuildById(guildId) ?: return
+    guild.updateCommands().addCommands(commands.map(CommandDefinition::asData)).queue()
+    CommandListener.getOrRegister(this).commands.addAll(commands)
 }
