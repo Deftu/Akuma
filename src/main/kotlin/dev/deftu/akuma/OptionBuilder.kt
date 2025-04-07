@@ -118,10 +118,11 @@ public sealed interface OptionBuilder {
         type: OptionType,
         override val name: String,
         override val description: String?,
+        isAutoComplete: Boolean,
         override var isRequired: Boolean = false,
         public var minValue: Double? = null,
         public var maxValue: Double? = null,
-    ) : BasicAutoCompletingOptionBuilder(type, name, description, false) {
+    ) : BasicAutoCompletingOptionBuilder(type, name, description, isAutoComplete) {
 
         override fun build(): CommandOption.NumberCommandOption {
             return CommandOption.NumberCommandOption(
@@ -140,8 +141,25 @@ public sealed interface OptionBuilder {
     public class StringOption(
         name: String,
         description: String?,
-        isAutoComplete: Boolean = false
-    ) : BasicAutoCompletingOptionBuilder(OptionType.STRING, name, description, isAutoComplete)
+        isAutoComplete: Boolean = false,
+        public var minLength: Int? = null,
+        public var maxLength: Int? = null,
+    ) : BasicAutoCompletingOptionBuilder(OptionType.STRING, name, description, isAutoComplete) {
+
+        override fun build(): CommandOption.StringCommandOption {
+            return CommandOption.StringCommandOption(
+                name = name,
+                description = description,
+                isRequired = isRequired,
+                isAutoComplete = isAutoComplete,
+                choices = choices,
+                autoComplete = autoComplete,
+                minLength = minLength,
+                maxLength = maxLength,
+            )
+        }
+
+    }
 
     public class IntOption(
         name: String,

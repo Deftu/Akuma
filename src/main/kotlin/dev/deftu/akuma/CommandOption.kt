@@ -37,6 +37,25 @@ public open class CommandOption(
 
     }
 
+    public class StringCommandOption(
+        name: String,
+        description: String?,
+        isRequired: Boolean,
+        choices: List<Command.Choice>,
+        isAutoComplete: Boolean,
+        autoComplete: (suspend (CommandAutoCompleteInteractionEvent) -> Unit)?,
+        public val minLength: Int? = null,
+        public val maxLength: Int? = null,
+    ) : AutoCompletingCommandOption(OptionType.STRING, name, description, isRequired, choices, isAutoComplete, autoComplete) {
+
+        override fun applyData(data: OptionData) {
+            super.applyData(data)
+            minLength?.let(data::setMinLength)
+            maxLength?.let(data::setMaxLength)
+        }
+
+    }
+
     public class NumberCommandOption(
         type: OptionType,
         name: String,
