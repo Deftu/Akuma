@@ -2,6 +2,7 @@ package dev.deftu.akuma
 
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
+import net.dv8tion.jda.api.interactions.DiscordLocale
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import java.util.EnumSet
@@ -64,6 +65,9 @@ public sealed interface OptionBuilder {
     public val description: String?
     public var isRequired: Boolean
 
+    public val nameLocalizations: MutableMap<DiscordLocale, String>
+    public val descriptionLocalizations: MutableMap<DiscordLocale, String>
+
     public fun required(value: Boolean): OptionBuilder = apply {
         isRequired = value
     }
@@ -81,13 +85,21 @@ public sealed interface OptionBuilder {
         override var isRequired: Boolean = false,
     ) : OptionBuilder {
 
+        override val nameLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+        override val descriptionLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+
         override fun build(): CommandOption {
-            return CommandOption(
+            val option = CommandOption(
                 type = type,
                 name = name,
                 description = description,
                 isRequired = isRequired,
             )
+
+            option.nameLocalizations.putAll(nameLocalizations)
+            option.descriptionLocalizations.putAll(descriptionLocalizations)
+
+            return option
         }
 
     }
@@ -100,8 +112,11 @@ public sealed interface OptionBuilder {
         override var isRequired: Boolean = false,
     ) : OptionBuilder, AutoCompletingOptionBuilder() {
 
+        override val nameLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+        override val descriptionLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+
         override fun build(): CommandOption.AutoCompletingCommandOption {
-            return CommandOption.AutoCompletingCommandOption(
+            val option = CommandOption.AutoCompletingCommandOption(
                 type = type,
                 name = name,
                 description = description,
@@ -110,6 +125,11 @@ public sealed interface OptionBuilder {
                 isAutoComplete = isAutoComplete,
                 autoComplete = autoComplete,
             )
+
+            option.nameLocalizations.putAll(nameLocalizations)
+            option.descriptionLocalizations.putAll(descriptionLocalizations)
+
+            return option
         }
 
     }
@@ -125,7 +145,7 @@ public sealed interface OptionBuilder {
     ) : BasicAutoCompletingOptionBuilder(type, name, description, isAutoComplete) {
 
         override fun build(): CommandOption.NumberCommandOption {
-            return CommandOption.NumberCommandOption(
+            val option = CommandOption.NumberCommandOption(
                 type = type,
                 name = name,
                 description = description,
@@ -134,6 +154,11 @@ public sealed interface OptionBuilder {
                 minValue = minValue,
                 maxValue = maxValue,
             )
+
+            option.nameLocalizations.putAll(nameLocalizations)
+            option.descriptionLocalizations.putAll(descriptionLocalizations)
+
+            return option
         }
 
     }
@@ -147,7 +172,7 @@ public sealed interface OptionBuilder {
     ) : BasicAutoCompletingOptionBuilder(OptionType.STRING, name, description, isAutoComplete) {
 
         override fun build(): CommandOption.StringCommandOption {
-            return CommandOption.StringCommandOption(
+            val option = CommandOption.StringCommandOption(
                 name = name,
                 description = description,
                 isRequired = isRequired,
@@ -157,6 +182,11 @@ public sealed interface OptionBuilder {
                 minLength = minLength,
                 maxLength = maxLength,
             )
+
+            option.nameLocalizations.putAll(nameLocalizations)
+            option.descriptionLocalizations.putAll(descriptionLocalizations)
+
+            return option
         }
 
     }
@@ -185,6 +215,9 @@ public sealed interface OptionBuilder {
 
         private val channelTypes = EnumSet.noneOf(ChannelType::class.java)
 
+        override val nameLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+        override val descriptionLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+
         public fun channelTypes(vararg types: ChannelType): ChannelOption = apply {
             channelTypes.addAll(types)
         }
@@ -198,12 +231,17 @@ public sealed interface OptionBuilder {
         }
 
         override fun build(): CommandOption.ChannelCommandOption {
-            return CommandOption.ChannelCommandOption(
+            val option = CommandOption.ChannelCommandOption(
                 name = name,
                 description = description,
                 isRequired = isRequired,
                 channelTypes = channelTypes,
             )
+
+            option.nameLocalizations.putAll(nameLocalizations)
+            option.descriptionLocalizations.putAll(descriptionLocalizations)
+
+            return option
         }
 
     }

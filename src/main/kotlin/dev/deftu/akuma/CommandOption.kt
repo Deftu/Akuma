@@ -2,6 +2,7 @@ package dev.deftu.akuma
 
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
+import net.dv8tion.jda.api.interactions.DiscordLocale
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -13,11 +14,17 @@ public open class CommandOption(
     public val description: String?,
     public val isRequired: Boolean,
 ) {
+
+    public val nameLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf<DiscordLocale, String>()
+    public val descriptionLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf<DiscordLocale, String>()
+
     public fun asData(): OptionData {
         return OptionData(type, name, description ?: "No description provided", isRequired).apply(::applyData)
     }
 
     protected open fun applyData(data: OptionData) {
+        data.setNameLocalizations(nameLocalizations)
+        data.setDescriptionLocalizations(descriptionLocalizations)
     }
 
     public open class AutoCompletingCommandOption(

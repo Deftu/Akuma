@@ -4,7 +4,6 @@ plugins {
     val dgtVersion = "2.30.0"
     id("dev.deftu.gradle.tools") version(dgtVersion)
     id("dev.deftu.gradle.tools.bloom") version(dgtVersion)
-    id("dev.deftu.gradle.tools.shadow") version(dgtVersion)
     id("dev.deftu.gradle.tools.publishing.maven") version(dgtVersion)
 }
 

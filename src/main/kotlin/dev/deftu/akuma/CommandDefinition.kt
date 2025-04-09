@@ -1,5 +1,6 @@
 package dev.deftu.akuma
 
+import net.dv8tion.jda.api.interactions.DiscordLocale
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
@@ -20,6 +21,9 @@ public open class CommandDefinition(
     private val sortedOptions: List<CommandOption>
         get() = options.sortedBy { !it.isRequired }
 
+    public val nameLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+    public val descriptionLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+
     public fun asData(): SlashCommandData {
         return Commands.slash(this.name, this.description ?: "No description provided").apply(::applyData)
     }
@@ -33,12 +37,18 @@ public open class CommandDefinition(
         data.isGuildOnly = this.isGuildOnly
         data.defaultPermissions = this.defaultGuildPermissions
 
+        data.setNameLocalizations(nameLocalizations)
+        data.setDescriptionLocalizations(descriptionLocalizations)
+
         sortedOptions.map(CommandOption::asData).forEach(data::addOptions)
         children.map(CommandDefinition::asSubData).forEach(data::addSubcommands)
         groups.map(CommandGroupDefinition::asData).forEach(data::addSubcommandGroups)
     }
 
     protected open fun applySubData(data: SubcommandData) {
+        data.setNameLocalizations(nameLocalizations)
+        data.setDescriptionLocalizations(descriptionLocalizations)
+
         sortedOptions.map(CommandOption::asData).forEach(data::addOptions)
     }
 

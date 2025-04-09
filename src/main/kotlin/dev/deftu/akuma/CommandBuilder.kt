@@ -1,6 +1,7 @@
 package dev.deftu.akuma
 
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.interactions.DiscordLocale
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 
 public class CommandBuilder(private val name: String) {
@@ -13,6 +14,10 @@ public class CommandBuilder(private val name: String) {
     private var action: (suspend CommandContext.() -> Unit)? = null
 
     public var description: String? = null
+
+    public val nameLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+
+    public val descriptionLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
 
     public var isNsfw: Boolean = false
         set(value) {
@@ -119,7 +124,7 @@ public class CommandBuilder(private val name: String) {
     }
 
     public fun build(): CommandDefinition {
-        return CommandDefinition(
+        val definition = CommandDefinition(
             name = name,
             description = description,
             options = options,
@@ -130,6 +135,11 @@ public class CommandBuilder(private val name: String) {
             defaultGuildPermissions = defaultGuildPermissions,
             action = action
         )
+
+        definition.nameLocalizations.putAll(nameLocalizations)
+        definition.descriptionLocalizations.putAll(descriptionLocalizations)
+
+        return definition
     }
 
 }
