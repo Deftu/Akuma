@@ -39,7 +39,7 @@ public open class CommandOption(
 
         override fun applyData(data: OptionData) {
             super.applyData(data)
-            data.isAutoComplete = true
+            data.isAutoComplete = isAutoComplete
         }
 
     }
