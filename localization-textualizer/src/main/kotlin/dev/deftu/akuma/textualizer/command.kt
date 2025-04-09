@@ -16,6 +16,10 @@ public fun <T : Language<T>> CommandBuilder.applyLocalizedNameTranslations(
     for (language in languages) {
         val locale = converter(language)
         val context = localization.with(language)
+        if (!context.isTranslated(key)) {
+            continue
+        }
+
         nameLocalizations[locale] = context.get(key)
     }
 }
@@ -31,6 +35,10 @@ public fun <T : Language<T>> CommandBuilder.applyLocalizedDescriptionTranslation
     for (language in languages) {
         val locale = converter(language)
         val context = localization.with(language)
+        if (!context.isTranslated(key)) {
+            continue
+        }
+
         descriptionLocalizations[locale] = context.get(key)
     }
 }
