@@ -151,6 +151,7 @@ public sealed interface OptionBuilder {
                 description = description,
                 isRequired = isRequired,
                 isAutoComplete = isAutoComplete,
+                autoComplete = autoComplete,
                 minValue = minValue,
                 maxValue = maxValue,
             )
