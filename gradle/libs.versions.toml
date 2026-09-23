@@ -1,5 +1,7 @@
 [versions]
-jda = "5.2.1"
+jda = "6.7.0"
+kord = "0.18.1"
 
 [libraries]
 jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
+kord-core = { group = "dev.kord", name = "kord-core", version.ref = "kord" }

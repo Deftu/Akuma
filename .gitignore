@@ -24,7 +24,9 @@ build
 .nb-gradle-properties
 
 # other
+docs
 .vscode
+.agents
 **/run
 **/prod
 **/old

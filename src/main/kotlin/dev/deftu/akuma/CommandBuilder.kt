@@ -1,9 +1,5 @@
 package dev.deftu.akuma
 
-import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.interactions.DiscordLocale
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
-
 public class CommandBuilder(private val name: String) {
 
     private var parent: CommandBuilder? = null
@@ -15,9 +11,9 @@ public class CommandBuilder(private val name: String) {
 
     public var description: String? = null
 
-    public val nameLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+    public val nameLocalizations: MutableMap<AkumaLocale, String> = mutableMapOf()
 
-    public val descriptionLocalizations: MutableMap<DiscordLocale, String> = mutableMapOf()
+    public val descriptionLocalizations: MutableMap<AkumaLocale, String> = mutableMapOf()
 
     public var isNsfw: Boolean = false
         set(value) {
@@ -37,7 +33,7 @@ public class CommandBuilder(private val name: String) {
             field = value
         }
 
-    public var defaultGuildPermissions: DefaultMemberPermissions = DefaultMemberPermissions.ENABLED
+    public var defaultGuildPermissions: AkumaDefaultPermissions = AkumaDefaultPermissions.ENABLED
         set(value) {
             if (parent != null) {
                 throw IllegalStateException("Cannot set defaultGuildPermissions on a child command")
@@ -62,7 +58,7 @@ public class CommandBuilder(private val name: String) {
         }
 
         children.add(CommandBuilder(name).apply {
-            this.parent = this@CommandBuilder.parent
+            this.parent = this@CommandBuilder
             this.description = description
             block()
         })
@@ -133,7 +129,8 @@ public class CommandBuilder(private val name: String) {
             isNsfw = isNsfw,
             isGuildOnly = isGuildOnly,
             defaultGuildPermissions = defaultGuildPermissions,
-            action = action
+            action = action,
+            type = AkumaCommandType.SLASH
         )
 
         definition.nameLocalizations.putAll(nameLocalizations)
@@ -142,11 +139,4 @@ public class CommandBuilder(private val name: String) {
         return definition
     }
 
-}
-
-public fun JDA.subcommand(name: String, block: CommandBuilder.() -> Unit): CommandDefinition {
-    val command = CommandBuilder(name).apply(block).build()
-    updateCommands().addCommands(command.asData()).queue()
-    CommandListener.getOrRegister(this).commands.add(command)
-    return command
 }
